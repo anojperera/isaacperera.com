@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build && jampack ./dist",
+    "deploy": "aws s3 sync dist/ s3://eniseperera-client",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
@@ -26,7 +27,8 @@
     "remark-toc": "^9.0.0",
     "satori": "^0.10.11",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "video.js": "^8.10.0"
   },
   "devDependencies": {
     "@astrojs/react": "^3.0.9",

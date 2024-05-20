@@ -3,7 +3,7 @@ author: Isaac Perera
 pubDatetime: 2024-04-28 14:24:54
 modDatetime: 2024-04-28 14:24:54
 title: Backstroke and Butterfly Time Trial at Maidstone SC
-slug: time_trial_back_fly
+slug: time-trial-back-fly
 featured: true
 draft: false
 tags:

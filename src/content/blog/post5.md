@@ -16,5 +16,5 @@ description: Played the violin at a String Workshop.
 Played the violin at a String Workshop in my school.
 
 <video id="1" class="video-js vjs-default-skin" controls preload="auto" width="1600" height="900">
-<source src="https://isaacperera-media.s3.eu-west-2.amazonaws.com/may-2024/IMG_3039.MOV" type='video/mp4' />
+<source src="https://isaacperera-media.s3.eu-west-2.amazonaws.com/may-2024/VIDEO-2024-05-23-16-50-39.mp4" type='video/mp4' />
 </video>

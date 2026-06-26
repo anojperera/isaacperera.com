@@ -5,6 +5,7 @@ import Footer from "@components/Footer.astro";
 import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
 import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
 import { SITE } from "@config";
@@ -26,7 +27,7 @@ const {
   tags,
 } = post.data;
 
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
@@ -48,63 +49,49 @@ const layoutProps = {
 
 <Layout {...layoutProps}>
   <Header />
-  <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
-    <button
-      class="focus-outline mb-2 mt-8 flex hover:opacity-75"
-      onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
+  <div class="mx-auto max-w-3xl px-4">
+    <a
+      href="javascript:history.back()"
+      class="mt-8 mb-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[color:var(--ink-soft)] transition hover:text-[color:var(--accent)]"
     >
-      <svg xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-        ></path>
-      </svg><span>Go back</span>
-    </button>
+      ← Back
+    </a>
   </div>
-  <main id="main-content">
-    <h1 transition:name={slugifyStr(title)} class="post-title">{title}</h1>
+
+  <main class="max-w-3xl mx-auto px-4 pb-16">
+    <h1
+      transition:name={slugifyStr(title)}
+      class="font-display text-3xl sm:text-4xl font-black tracking-tight leading-tight mt-2 mb-3 text-[color:var(--ink)]"
+    >
+      {title}
+    </h1>
+
     <Datetime
       pubDatetime={pubDatetime}
       modDatetime={modDatetime}
       size="lg"
-      className="my-2"
+      className="mb-6 opacity-75"
     />
-    <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
+
+    <article class="prose prose-lg max-w-none">
       <Content />
     </article>
 
-    <ul class="my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-    </ul>
+    <div class="my-8 flex flex-wrap gap-2">
+      {tags.map(tag => <Tag tag={slugifyStr(tag)} size="lg" />)}
+    </div>
 
     <div
-      class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
+      class="mt-10 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-6 border-t border-[color:var(--line)] pt-8"
     >
-      <button
-        id="back-to-top"
-        class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
-          <path
-            d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-          ></path>
-        </svg>
-        <span>Back to Top</span>
+      <button id="back-to-top" class="cool-button-secondary text-sm">
+        ↑ Back to top
       </button>
-
       <ShareLinks />
     </div>
   </main>
   <Footer />
 </Layout>
-
-<style>
-  main {
-    @apply mx-auto w-full max-w-3xl px-4 pb-12;
-  }
-  .post-title {
-    @apply text-2xl font-semibold text-skin-accent;
-  }
-</style>
 
 <script is:inline>
   /** Attaches links to headings in the document,
@@ -122,6 +109,46 @@ const layoutProps = {
     }
   }
   addHeadingLinks();
+
+  /** Wraps each embedded video in a frame with a loading spinner that
+   *  disappears once the video is ready to play (or fails to load). */
+  function attachMediaSpinners() {
+    let videos = Array.from(document.querySelectorAll(".prose video"));
+    for (let video of videos) {
+      if (video.closest(".media-frame")) continue; // already wrapped
+
+      let frame = document.createElement("div");
+      frame.className = "media-frame is-loading";
+
+      let spinner = document.createElement("div");
+      spinner.className = "media-spinner";
+      spinner.setAttribute("role", "status");
+      spinner.innerHTML =
+        '<span class="media-spinner__ring" aria-hidden="true"></span>' +
+        '<span class="media-spinner__label">Loading</span>';
+
+      video.parentNode.insertBefore(frame, video);
+      frame.appendChild(video);
+      frame.appendChild(spinner);
+
+      let stop = () => frame.classList.remove("is-loading");
+
+      // Already buffered enough to play (e.g. served from cache).
+      if (video.readyState >= 2) {
+        stop();
+      } else {
+        video.addEventListener("loadeddata", stop, { once: true });
+        video.addEventListener("canplay", stop, { once: true });
+        video.addEventListener("playing", stop, { once: true });
+        video.addEventListener("error", () => {
+          frame.classList.add("has-error");
+          let label = spinner.querySelector(".media-spinner__label");
+          if (label) label.textContent = "Unavailable";
+        });
+      }
+    }
+  }
+  attachMediaSpinners();
 
   /** Attaches copy buttons to code blocks in the document,
    * allowing users to copy code easily. */

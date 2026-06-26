@@ -15,9 +15,33 @@ module.exports = {
     // if one breakpoint is not enough for you
     screens: {
       sm: "640px",
+      md: "768px",
+      lg: "1024px",
     },
 
     extend: {
+      colors: {
+        // Cool, energetic palette for a 10 year old adventurer
+        brand: {
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          500: "#0ea5e9", // Sky / swimming blue
+          600: "#0284c8",
+          700: "#0369a1",
+        },
+        energy: {
+          500: "#f97316", // Bold orange
+          600: "#ea580c",
+        },
+        explore: {
+          500: "#22c55e", // Science green
+          600: "#16a34a",
+        },
+        jam: {
+          500: "#a855f7", // Violin / music purple
+          600: "#9333ea",
+        },
+      },
       textColor: {
         skin: {
           base: withOpacity("--color-text-base"),
@@ -54,7 +78,20 @@ module.exports = {
         transparent: "transparent",
       },
       fontFamily: {
+        sans: [
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "sans-serif",
+        ],
         mono: ["IBM Plex Mono", "monospace"],
+      },
+      boxShadow: {
+        cool: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "cool-lg": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
       },
 
       typography: {

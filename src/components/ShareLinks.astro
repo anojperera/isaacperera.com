@@ -38,14 +38,18 @@ const shareLinks = [
 ] as const;
 ---
 
-<div class={`social-icons`}>
-  <span class="italic">Share this post on:</span>
-  <div class="text-center">
+<div>
+  <div
+    class="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-[color:var(--accent)]"
+  >
+    ⇄ Share
+  </div>
+  <div class="flex flex-wrap gap-1.5">
     {
       shareLinks.map(social => (
         <LinkButton
           href={`${social.href + URL}`}
-          className="link-button"
+          className="link-button rounded-xl border p-2.5"
           title={social.linkTitle}
         >
           <Fragment set:html={socialIcons[social.name]} />
@@ -57,10 +61,16 @@ const shareLinks = [
 </div>
 
 <style>
-  .social-icons {
-    @apply flex flex-col flex-wrap items-center justify-center gap-1 sm:items-start;
-  }
+  @reference "tailwindcss";
   .link-button {
-    @apply scale-90 p-2 hover:rotate-6 sm:p-1;
+    border-color: var(--panel-border);
+    background: color-mix(in srgb, var(--bg-2) 60%, transparent);
+    color: var(--ink-soft);
+    @apply transition hover:-translate-y-0.5;
+  }
+  .link-button:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 20px -6px var(--glow-a);
   }
 </style>

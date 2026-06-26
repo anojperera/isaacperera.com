@@ -54,19 +54,17 @@ breadcrumbList[0] === "tags" &&
 </nav>
 
 <style>
+  @reference "tailwindcss";
   .breadcrumb {
-    @apply mx-auto mb-1 mt-8 w-full max-w-3xl px-4;
+    @apply mx-auto mb-1 mt-6 w-full max-w-3xl px-4 text-sm;
   }
   .breadcrumb ul li {
     @apply inline;
   }
   .breadcrumb ul li a {
-    @apply capitalize opacity-70;
+    @apply capitalize opacity-60 hover:opacity-100 transition;
   }
   .breadcrumb ul li span {
-    @apply opacity-70;
-  }
-  .breadcrumb ul li:not(:last-child) a {
-    @apply hover:opacity-100;
+    @apply opacity-40 mx-1.5;
   }
 </style>

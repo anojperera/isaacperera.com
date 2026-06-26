@@ -1,14 +1,14 @@
 import type { Site, SocialObjects } from "./types";
 
 export const SITE: Site = {
-  website: "https://isaacperera.com", // replace this with your deployed domain
+  website: "https://isaacperera.com",
   author: "Isaac Perera",
-  desc: "My personal webspace about things I like to share about myself.",
+  desc: "Swimmer. Violinist. Science explorer. Welcome to my world!",
   title: "isaacperera",
   ogImage: "astropaper-og.jpg",
-  lightAndDarkMode: true,
+  lightAndDarkMode: false,
   postPerPage: 3,
-  scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
+  scheduledPostMargin: 15 * 60 * 1000,
 };
 
 export const LOCALE = {

@@ -83,24 +83,25 @@ export default function SearchBar({ searchList }: Props) {
           <span className="sr-only">Search</span>
         </span>
         <input
-          className="block w-full rounded border border-skin-fill 
-        border-opacity-40 bg-skin-fill py-3 pl-10
-        pr-3 placeholder:italic placeholder:text-opacity-75 
-        focus:border-skin-accent focus:outline-none"
-          placeholder="Search for anything..."
+          className="block w-full rounded-xl border bg-[color:var(--panel)] px-5 py-3 pl-12 font-mono text-base text-[color:var(--ink)] backdrop-blur-md placeholder:text-[color:var(--ink-soft)] focus:outline-none"
+          style={{ borderColor: "var(--panel-border)" }}
+          onFocus={e => (e.currentTarget.style.borderColor = "var(--accent)")}
+          onBlur={e =>
+            (e.currentTarget.style.borderColor = "var(--panel-border)")
+          }
+          placeholder="Search swimming, violin, science..."
           type="text"
           name="search"
           value={inputVal}
           onChange={handleChange}
           autoComplete="off"
-          // autoFocus
           ref={inputRef}
         />
       </label>
 
       {inputVal.length > 1 && (
-        <div className="mt-8">
-          Found {searchResults?.length}
+        <div className="mt-8 font-mono text-sm text-[color:var(--ink-soft)]">
+          ▸ Found {searchResults?.length}
           {searchResults?.length && searchResults?.length === 1
             ? " result"
             : " results"}{" "}

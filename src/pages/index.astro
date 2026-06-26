@@ -3,13 +3,11 @@ import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import LinkButton from "@components/LinkButton.astro";
-import Hr from "@components/Hr.astro";
 import Card from "@components/Card";
 import getSortedPosts from "@utils/getSortedPosts";
+import getPostSlug from "@utils/getPostSlug";
 
 const posts = await getCollection("blog");
-
 const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
@@ -17,120 +15,142 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
 <Layout>
   <Header />
-  <main id="main-content">
-    <section id="hero">
-      <h1>Hello</h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="rss-link"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
-          ><path
-            d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
-          ></path><path
-            d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
-          ></path><circle cx="6" cy="18" r="2"></circle>
-        </svg>
-        <span class="sr-only">RSS Feed</span>
-      </a>
+  <main id="main-content" class="mx-auto max-w-3xl px-4">
+    <!-- Hero / mission console -->
+    <section class="relative pb-14 pt-12 text-center sm:pb-20 sm:pt-16">
+      <p class="reveal kicker mb-5" style="animation-delay:.05s">
+        ▸ Personal mission log · online
+      </p>
 
-      <p>This is my first website and space for sharing</p>
+      <h1
+        class="reveal font-display text-5xl font-black leading-[0.95] tracking-tight sm:text-7xl"
+        style="animation-delay:.12s"
+      >
+        Hey, I'm<br />
+        <span class="grad-text">ISAAC</span>
+      </h1>
+
+      <p
+        class="reveal mx-auto mt-6 max-w-md text-lg text-[color:var(--ink-soft)] sm:text-xl"
+        style="animation-delay:.2s"
+      >
+        Swimmer · Violinist · Science explorer.<br />
+        Welcome aboard my corner of the universe.
+      </p>
+
+      <!-- HUD readouts -->
+      <div
+        class="reveal mx-auto mt-8 grid max-w-lg grid-cols-3 gap-3 font-mono"
+        style="animation-delay:.28s"
+      >
+        <div class="stat hud-bracket">
+          <span class="stat-ico">🏊</span>
+          <span class="stat-label">Pool</span>
+        </div>
+        <div class="stat hud-bracket">
+          <span class="stat-ico">🎻</span>
+          <span class="stat-label">Strings</span>
+        </div>
+        <div class="stat hud-bracket">
+          <span class="stat-ico">🧪</span>
+          <span class="stat-label">Lab</span>
+        </div>
+      </div>
+
+      <div
+        class="reveal mt-9 flex flex-wrap justify-center gap-4"
+        style="animation-delay:.36s"
+      >
+        <a href="/posts/" class="cool-button">
+          Launch adventures
+          <span aria-hidden="true">→</span>
+        </a>
+        <a href="/about/" class="cool-button-secondary"> About me </a>
+      </div>
     </section>
 
-    <Hr />
-
+    <!-- Featured -->
     {
       featuredPosts.length > 0 && (
-        <>
-          <section id="featured">
-            <h2>Featured</h2>
-            <ul>
-              {featuredPosts.map(({ data, slug }) => (
-                <Card
-                  href={`/posts/${slug}/`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
-            </ul>
-          </section>
-          {recentPosts.length > 0 && <Hr />}
-        </>
-      )
-    }
-
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts">
-          <h2>Recent Posts</h2>
-          <ul>
-            {recentPosts.map(
-              ({ data, slug }, index) =>
-                index < 4 && (
-                  <Card
-                    href={`/posts/${slug}/`}
-                    frontmatter={data}
-                    secHeading={false}
-                  />
-                )
-            )}
+        <section class="reveal pb-12" style="animation-delay:.42s">
+          <div class="mb-6 flex items-center gap-3">
+            <div class="accent-bar" />
+            <div>
+              <p class="kicker">★ priority signal</p>
+              <h2 class="section-title">Featured</h2>
+            </div>
+          </div>
+          <ul class="grid gap-4 sm:gap-5">
+            {featuredPosts.map(post => (
+              <Card
+                href={`/posts/${getPostSlug(post)}/`}
+                frontmatter={post.data}
+              />
+            ))}
           </ul>
         </section>
       )
     }
 
-    <div class="all-posts-btn-wrapper">
-      <LinkButton href="/posts/">
-        All Posts
-        <svg xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-          ></path>
-        </svg>
-      </LinkButton>
-    </div>
+    <!-- Recent Posts -->
+    {
+      recentPosts.length > 0 && (
+        <section class="reveal pb-14" style="animation-delay:.5s">
+          <div class="mb-6 flex items-center gap-3">
+            <div class="accent-bar" />
+            <div>
+              <p class="kicker">⟁ incoming transmissions</p>
+              <h2 class="section-title">Latest Posts</h2>
+            </div>
+          </div>
+          <ul class="grid gap-4 sm:gap-5">
+            {recentPosts.slice(0, 4).map(post => (
+              <Card
+                href={`/posts/${getPostSlug(post)}/`}
+                frontmatter={post.data}
+              />
+            ))}
+          </ul>
+
+          <div class="mt-9 text-center">
+            <a href="/posts/" class="cool-button-secondary">
+              All posts
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M14 5l7 7-7 7"
+                />
+              </svg>
+            </a>
+          </div>
+        </section>
+      )
+    }
   </main>
+
+  <style>
+    @reference "tailwindcss";
+    .stat {
+      @apply relative flex flex-col items-center gap-1 rounded-xl border py-4 backdrop-blur-md;
+      background: var(--panel);
+      border-color: var(--panel-border);
+    }
+    .stat-ico {
+      @apply text-2xl;
+    }
+    .stat-label {
+      @apply text-[10px] uppercase tracking-[0.25em];
+      color: var(--ink-soft);
+    }
+  </style>
 
   <Footer />
 </Layout>
-
-<style>
-  /* ===== Hero Section ===== */
-  #hero {
-    @apply pb-6 pt-8;
-  }
-  #hero h1 {
-    @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
-  }
-  #hero .rss-link {
-    @apply mb-6;
-  }
-  #hero .rss-icon {
-    @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
-  }
-  #hero p {
-    @apply my-2;
-  }
-  .social-wrapper {
-    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
-  }
-  .social-links {
-    @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
-  }
-
-  /* ===== Featured & Recent Posts Sections ===== */
-  #featured,
-  #recent-posts {
-    @apply pb-6 pt-12;
-  }
-  #featured h2,
-  #recent-posts h2 {
-    @apply text-2xl font-semibold tracking-wide;
-  }
-  .all-posts-btn-wrapper {
-    @apply my-8 text-center;
-  }
-</style>

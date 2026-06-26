@@ -1,76 +1,183 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
+@source "../**/*.{astro,html,js,jsx,md,mdx,ts,tsx}";
+@plugin "@tailwindcss/typography";
+
+@theme inline {
+  /* ===== Fonts ===== */
+  --font-display: "Orbitron", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ===== Neon mission-control palette ===== */
+  --color-aqua-300: #7ef0ff;
+  --color-aqua-400: #38e0f5;
+  --color-aqua-500: #18c9e6;
+  --color-aqua-600: #0aa3c2;
+
+  --color-violet-400: #c07bff;
+  --color-violet-500: #a855f7;
+
+  --color-lime-400: #b6f24a;
+  --color-lime-500: #8fd820;
+
+  --color-energy-500: #ff8a3d;
+
+  /* Back-compat aliases used across components */
+  --color-brand-50: #ecfeff;
+  --color-brand-100: #cffafe;
+  --color-brand-300: #7ef0ff;
+  --color-brand-400: #38e0f5;
+  --color-brand-500: #18c9e6;
+  --color-brand-600: #0aa3c2;
+  --color-brand-700: #0e7490;
+  --color-brand-900: #083f4d;
+  --color-explore-500: #8fd820;
+  --color-jam-500: #a855f7;
+
+  --color-skin-accent: #18c9e6;
+
+  /* Legacy skin-* aliases mapped to runtime theme vars */
+  --color-skin-fill: var(--bg);
+  --color-skin-base: var(--ink);
+  --color-skin-card: var(--bg-2);
+  --color-skin-line: var(--line);
+  --color-skin-inverted: #04121a;
+}
 
 @layer base {
-  :root,
-  html[data-theme="light"] {
-    --color-fill: 251, 254, 251;
-    --color-text-base: 40, 39, 40;
-    --color-accent: 0, 108, 172;
-    --color-card: 230, 230, 230;
-    --color-card-muted: 205, 205, 205;
-    --color-border: 236, 233, 233;
+  :root {
+    /* Deep-space console (dark-only) */
+    --bg: #05080f;
+    --bg-2: #0a1322;
+    --ink: #dceaf7;
+    --ink-soft: #8aa3c0;
+    --line: rgba(120, 200, 255, 0.14);
+    --panel: rgba(13, 24, 43, 0.62);
+    --panel-border: rgba(90, 200, 240, 0.18);
+    --accent: #38e0f5;
+    --accent-2: #c07bff;
+    --accent-3: #b6f24a;
+    --glow-a: rgba(56, 224, 245, 0.4);
+    --glow-b: rgba(176, 107, 255, 0.34);
+    --glow-c: rgba(182, 242, 74, 0.22);
+    --grid: rgba(120, 200, 255, 0.06);
   }
-  html[data-theme="dark"] {
-    --color-fill: 33, 39, 55;
-    --color-text-base: 234, 237, 243;
-    --color-accent: 255, 107, 1;
-    --color-card: 52, 63, 96;
-    --color-card-muted: 138, 51, 2;
-    --color-border: 171, 75, 8;
+
+  html {
+    color-scheme: dark;
   }
-  #sun-svg,
-  html[data-theme="dark"] #moon-svg {
-    display: none;
-  }
-  #moon-svg,
-  html[data-theme="dark"] #sun-svg {
-    display: block;
-  }
+
   body {
-    @apply flex min-h-[100svh] flex-col bg-skin-fill font-mono text-skin-base 
-    selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
+    @apply relative flex min-h-[100svh] flex-col font-sans antialiased;
+    background-color: var(--bg);
+    color: var(--ink);
   }
+  ::selection {
+    background: var(--accent);
+    color: #04121a;
+  }
+
   section,
   footer {
     @apply mx-auto max-w-3xl px-4;
   }
+
   a {
-    @apply outline-2 outline-offset-1 outline-skin-fill 
-    focus-visible:no-underline focus-visible:outline-dashed;
+    @apply outline-2 outline-offset-2 outline-transparent transition focus-visible:outline-[color:var(--accent)];
   }
+
   svg {
-    @apply inline-block h-6 w-6 fill-skin-base group-hover:fill-skin-accent;
+    @apply inline-block h-6 w-6;
+    fill: currentColor;
   }
   svg.icon-tabler {
-    @apply inline-block h-6 w-6 scale-125 fill-transparent 
-    stroke-current stroke-2 opacity-90 group-hover:fill-transparent 
-    sm:scale-110;
+    @apply inline-block h-6 w-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 sm:scale-110;
   }
-  .prose {
-    @apply prose-headings:!mb-3 prose-headings:!text-skin-base 
-    prose-h3:italic prose-p:!text-skin-base 
-    prose-a:!text-skin-base prose-a:!decoration-dashed prose-a:underline-offset-8
-    hover:prose-a:text-skin-accent prose-blockquote:!border-l-skin-accent
-    prose-blockquote:border-opacity-50 prose-blockquote:opacity-80
-    prose-figcaption:!text-skin-base prose-figcaption:opacity-70
-    prose-strong:!text-skin-base
 
-    
-    prose-code:rounded prose-code:bg-skin-card 
-    prose-code:bg-opacity-75 prose-code:p-1 
+  /* ===== Atmosphere: HUD grid + drifting glow orbs + grain ===== */
+  .fx-bg {
+    @apply pointer-events-none fixed inset-0 -z-10 overflow-hidden;
+  }
+  .fx-grid {
+    @apply absolute inset-0;
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 30%, transparent 80%);
+  }
+  .fx-orb {
+    @apply absolute rounded-full;
+    filter: blur(70px);
+    opacity: 0.7;
+  }
+  .fx-orb-a {
+    width: 38rem;
+    height: 38rem;
+    top: -12rem;
+    left: -8rem;
+    background: radial-gradient(circle at 30% 30%, var(--glow-a), transparent 65%);
+    animation: drift-a 22s ease-in-out infinite alternate;
+  }
+  .fx-orb-b {
+    width: 32rem;
+    height: 32rem;
+    top: -6rem;
+    right: -10rem;
+    background: radial-gradient(circle at 60% 40%, var(--glow-b), transparent 65%);
+    animation: drift-b 26s ease-in-out infinite alternate;
+  }
+  .fx-orb-c {
+    width: 30rem;
+    height: 30rem;
+    bottom: -14rem;
+    left: 30%;
+    background: radial-gradient(circle at 50% 50%, var(--glow-c), transparent 65%);
+    animation: drift-c 30s ease-in-out infinite alternate;
+  }
+  .fx-grain {
+    @apply absolute inset-0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+
+  @keyframes drift-a {
+    to { transform: translate3d(6rem, 4rem, 0) scale(1.15); }
+  }
+  @keyframes drift-b {
+    to { transform: translate3d(-5rem, 5rem, 0) scale(1.1); }
+  }
+  @keyframes drift-c {
+    to { transform: translate3d(4rem, -4rem, 0) scale(1.2); }
+  }
+
+  /* ===== Prose (article body) ===== */
+  .prose {
+    @apply prose-headings:!mb-3 prose-headings:!font-display prose-headings:!font-semibold prose-headings:!text-[color:var(--ink)]
+    prose-p:!leading-relaxed prose-p:!text-[color:var(--ink)]
+    prose-a:!text-[color:var(--accent)] prose-a:!decoration-2 prose-a:underline-offset-4
+    prose-blockquote:!border-l-[color:var(--accent)] prose-blockquote:!not-italic prose-blockquote:!text-[color:var(--ink-soft)]
+    prose-figcaption:!text-[color:var(--ink-soft)] prose-figcaption:font-mono prose-figcaption:text-xs
+    prose-strong:!font-semibold prose-strong:!text-[color:var(--ink)]
+    prose-code:rounded-md prose-code:bg-[color:var(--bg-2)] prose-code:p-1 prose-code:font-mono prose-code:text-[color:var(--accent)]
     prose-code:before:!content-none prose-code:after:!content-none
-    prose-ol:!text-skin-base 
-    prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent
-    prose-table:text-skin-base prose-th:border
-    prose-th:border-skin-line prose-td:border 
-    prose-td:border-skin-line prose-img:!my-2 
-    prose-img:mx-auto prose-img:border-2 
-    prose-img:border-skin-line prose-hr:!border-skin-line;
+    prose-ol:!text-[color:var(--ink)] prose-ul:overflow-x-clip prose-ul:!text-[color:var(--ink)]
+    prose-li:marker:!text-[color:var(--accent)]
+    prose-table:text-[color:var(--ink)] prose-th:border prose-th:border-[color:var(--line)]
+    prose-td:border prose-td:border-[color:var(--line)]
+    prose-img:!my-4 prose-img:mx-auto prose-img:rounded-2xl prose-img:border prose-img:border-[color:var(--panel-border)]
+    prose-hr:!border-[color:var(--line)] max-w-none;
   }
   .prose a {
-    @apply break-words hover:!text-skin-accent;
+    @apply break-words;
+  }
+  .prose a:hover {
+    text-shadow: 0 0 12px var(--glow-a);
   }
   .prose thead th:first-child,
   tbody td:first-child,
@@ -81,47 +188,128 @@
     @apply mb-2;
   }
   .prose details {
-    @apply inline-block cursor-pointer select-none text-skin-base;
-  }
-  .prose summary {
-    @apply focus-outline;
+    @apply inline-block cursor-pointer select-none;
+    color: var(--ink);
   }
   .prose h2#table-of-contents + p {
     @apply hidden;
   }
 
+  /* Glowing frame around embedded videos */
+  .prose video {
+    @apply w-full rounded-2xl border;
+    border-color: var(--panel-border);
+    box-shadow: 0 0 0 1px var(--line), 0 24px 60px -24px var(--glow-a);
+    background: #000;
+    display: block;
+  }
+
+  /* Media frame + loading spinner (wrapper injected by PostDetails) */
+  .media-frame {
+    position: relative;
+    margin-block: 1.25rem;
+  }
+  .media-frame video {
+    margin-block: 0;
+  }
+  .media-spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    border-radius: 1rem;
+    background: radial-gradient(
+      circle at 50% 45%,
+      color-mix(in srgb, var(--bg-2) 85%, transparent),
+      color-mix(in srgb, #000 80%, transparent)
+    );
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .media-spinner__ring {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    border: 3px solid color-mix(in srgb, var(--accent) 22%, transparent);
+    border-top-color: var(--accent);
+    box-shadow: 0 0 18px -2px var(--glow-a);
+    animation: media-spin 0.8s linear infinite;
+  }
+  .media-spinner__label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  /* Hide spinner once the video is ready (or errored) */
+  .media-frame:not(.is-loading) .media-spinner {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .media-frame.has-error .media-spinner__ring {
+    animation: none;
+    border-top-color: var(--accent-2);
+  }
+  @keyframes media-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .media-spinner__ring {
+      animation-duration: 1.6s;
+    }
+  }
+
   /* ===== scrollbar ===== */
   html {
     overflow-y: scroll;
+    scrollbar-color: var(--accent) transparent;
   }
-
-  /* width */
   ::-webkit-scrollbar {
-    @apply w-3;
+    @apply w-2.5;
   }
-
-  /* Track */
   ::-webkit-scrollbar-track {
-    @apply bg-skin-fill;
+    background: transparent;
   }
-
-  /* Handle */
   ::-webkit-scrollbar-thumb {
-    @apply bg-skin-card;
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-skin-card-muted;
+    border-radius: 9999px;
+    background: linear-gradient(var(--accent), var(--accent-2));
   }
 
   code,
   blockquote {
     word-wrap: break-word;
   }
-
   pre > code {
     white-space: pre;
+  }
+
+  /* Heading anchor links injected by PostDetails */
+  .heading-link {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Copy button injected onto code blocks */
+  .copy-code {
+    border: 1px solid var(--panel-border);
+    background: var(--bg-2);
+    color: var(--ink-soft);
+    border-radius: 0.4rem;
+    font-family: var(--font-mono);
+    transition: all 0.2s ease;
+  }
+  .copy-code:hover {
+    color: var(--accent);
+    border-color: var(--accent);
   }
 }
 
@@ -129,7 +317,138 @@
   .display-none {
     @apply hidden;
   }
-  .focus-outline {
-    @apply outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed;
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* ===== HUD glass panel / card ===== */
+  .fun-card {
+    @apply relative overflow-hidden rounded-2xl border p-6 backdrop-blur-md transition-all duration-300;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--panel) 100%, transparent), color-mix(in srgb, var(--bg-2) 30%, transparent)),
+      var(--panel);
+    border-color: var(--panel-border);
+    box-shadow: 0 1px 0 0 var(--line) inset, 0 18px 40px -28px rgba(0, 0, 0, 0.6);
+  }
+  .fun-card::after {
+    /* sweeping holographic sheen on hover */
+    content: "";
+    @apply pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(115deg, transparent 30%, var(--glow-a) 50%, transparent 70%);
+    mix-blend-mode: screen;
+  }
+  .fun-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--panel-border));
+    box-shadow:
+      0 1px 0 0 var(--line) inset,
+      0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent),
+      0 30px 60px -30px var(--glow-a);
+  }
+  .fun-card:hover::after {
+    @apply opacity-30;
+  }
+
+  /* HUD corner brackets */
+  .hud-bracket::before,
+  .hud-bracket::after {
+    content: "";
+    @apply pointer-events-none absolute h-4 w-4;
+    border-color: var(--accent);
+  }
+  .hud-bracket::before {
+    @apply left-2.5 top-2.5 border-l-2 border-t-2 rounded-tl-sm;
+  }
+  .hud-bracket::after {
+    @apply bottom-2.5 right-2.5 border-b-2 border-r-2 rounded-br-sm;
+  }
+
+  /* ===== Section title (console heading) ===== */
+  .section-title {
+    @apply font-display text-xl font-bold uppercase tracking-[0.18em] sm:text-2xl;
+    color: var(--ink);
+  }
+  .kicker {
+    @apply font-mono text-xs uppercase tracking-[0.35em];
+    color: var(--accent);
+  }
+  .accent-bar {
+    @apply h-5 w-1.5 rounded-full;
+    background: linear-gradient(var(--accent), var(--accent-2));
+    box-shadow: 0 0 12px var(--glow-a);
+  }
+
+  /* ===== Buttons ===== */
+  .cool-button {
+    @apply relative inline-flex items-center gap-2 overflow-hidden rounded-xl px-6 py-3 font-display text-sm font-semibold uppercase tracking-widest text-[#04121a] transition active:scale-[0.97];
+    background: linear-gradient(120deg, var(--accent), var(--accent-3));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 60%, transparent), 0 14px 30px -12px var(--glow-a);
+  }
+  .cool-button:hover {
+    box-shadow: 0 0 0 1px var(--accent), 0 18px 40px -10px var(--glow-a);
+    filter: brightness(1.08);
+  }
+
+  .cool-button-secondary {
+    @apply relative inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 font-display text-sm font-medium uppercase tracking-widest backdrop-blur-md transition;
+    color: var(--ink);
+    border-color: var(--panel-border);
+    background: var(--panel);
+  }
+  .cool-button-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 24px -6px var(--glow-a);
+  }
+
+  /* ===== Tag / data chip ===== */
+  .tag-pill {
+    @apply inline-flex items-center rounded-md border px-2.5 py-0.5 font-mono text-xs tracking-wide transition;
+    border-color: var(--line);
+    background: color-mix(in srgb, var(--bg-2) 60%, transparent);
+    color: var(--ink-soft);
+  }
+
+  /* ===== Entrance animation (staggered page-load reveal) ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes reveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Animated gradient text for the hero name */
+  .grad-text {
+    background: linear-gradient(100deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+    background-size: 280% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: hue 8s linear infinite;
+  }
+  @keyframes hue {
+    to { background-position: 280% 0; }
+  }
+
+  .nav-active {
+    color: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal,
+    .grad-text,
+    .fx-orb {
+      animation: none !important;
+    }
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
   }
 }

@@ -3,8 +3,8 @@ import type { Site, SocialObjects } from "./types";
 export const SITE: Site = {
   website: "https://isaacperera.com",
   author: "Isaac Perera",
-  desc: "Swimmer. Violinist. Science explorer. Welcome to my world!",
-  title: "isaacperera",
+  desc: "Swimmer · Violinist · Science explorer. Welcome to my personal mission log.",
+  title: "Isaac Perera",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: false,
   postPerPage: 3,

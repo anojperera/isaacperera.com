@@ -33,3 +33,7 @@ pnpm-debug.log*
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+# Grok / session files
+grok.txt
+.*grok*

@@ -1,54 +1,60 @@
 # GROK.md — isaacperera.com
 
-A personal static website for Isaac Perera (a boy). It serves as a simple webspace for sharing swimming achievements, violin/string performances, science projects, and other personal updates.
+A personal static website for Isaac Perera (a boy). It serves as a "mission log" / deep-space console for sharing swimming achievements, violin/string performances, science projects, and other personal updates.
 
-Built on the [AstroPaper](https://github.com/satnaing/astro-paper) Astro theme (v4) with heavy customization for a child's content.
+The site has a custom **sci-fi "Mission Control" UI** designed to feel exciting for a 10-year-old explorer: neon aqua/violet/lime accents on a dark starfield console, glassy header, HUD-style stats, animated reveals, glowing video frames, and subtle background grid + drifting orbs + film grain.
+
+Built on the [AstroPaper](https://github.com/satnaing/astro-paper) Astro theme with heavy customization.
 
 ## Core Technology
 
-- **Framework**: Astro 4 (static site generation)
-- **Content**: Astro Content Collections using Markdown (`.md` files in `src/content/blog/`) with rich HTML embeds
-- **Interactive UI**: React components via `@astrojs/react` (Search, Card)
-- **Styling**: Tailwind CSS + `@tailwindcss/typography` with custom "skin" design tokens for light/dark themes
-- **Fonts**: IBM Plex Mono (loaded via Google Fonts + self-hosted for OG images)
+- **Framework**: Astro 7 (static site generation)
+- **Content**: Astro Content Collections (glob loader) using Markdown (`.md` files in `src/content/blog/`) with rich HTML embeds (especially `<video>`)
+- **Interactive UI**: React 19 components via `@astrojs/react` (Search, Card)
+- **Styling**: Tailwind CSS 4 via `@tailwindcss/vite` plugin + `@tailwindcss/typography`. Heavy use of CSS custom properties for the mission-control theme (`--bg`, `--ink`, `--accent`, `--glow-*`, etc.). Dark-only (`lightAndDarkMode: false`).
+- **Fonts**: Custom display stack (Orbitron + Outfit) + Outfit sans + IBM Plex Mono
 - **Search**: Fuse.js (client-side, URL-synced query)
 - **OG Images**: Dynamic generation using Satori + @resvg/resvg-js (no external service)
-- **RSS / Sitemap**: Native Astro integrations (`@astrojs/rss`, `@astrojs/sitemap`)
-- **Remark plugins**: `remark-toc` + `remark-collapse` (for "Table of contents")
-- **Video**: Direct `<video>` HTML embeds (classed for video.js styling) served from external S3 bucket
+- **RSS / Sitemap**: Native Astro integrations
+- **Remark plugins**: `remark-toc` + `remark-collapse` (wired via `@astrojs/markdown-remark` unified processor)
+- **Video**: Direct `<video class="video-js ...">` embeds pointing to external media S3 bucket. Styled with glowing frames.
 - **Build optimization**: jampack (`@divriots/jampack`)
-- **TypeScript** + ESLint + Prettier + Husky
+- **TypeScript** + ESLint 9 + Prettier + Husky 9
+- **UI Effects**: "reveal" animations, pulsing logo dot, drifting background orbs, HUD grid + grain (defined in `src/layouts/Layout.astro` + `base.css`)
+- **Header**: Glassy rounded "header-bar" with callsign logo, uppercase tracking-widest nav links, mobile slide-in menu.
 
 ## Project Structure
 
 ```
 src/
-├── components/          # Reusable UI (Header, Footer, Card, Tag, Search, etc.)
-├── config.ts            # Site-wide constants (SITE, SOCIALS, LOCALE, LOGO_IMAGE)
+├── components/          # Reusable UI (Header with glassy bar + mobile menu, Footer, Card, Tag, Search, etc.)
+├── config.ts            # Site-wide constants (SITE, SOCIALS, LOCALE, LOGO_IMAGE) — lightAndDarkMode: false
+├── content.config.ts    # Content collection (glob loader + Zod schema). Moved from legacy src/content/config.ts for Astro 6/7
 ├── content/
-│   ├── blog/            # All blog posts as .md files
-│   └── config.ts        # Content collection schema (Zod)
-├── layouts/             # Page layouts (Layout, PostDetails, AboutLayout, Posts, TagPosts, Main)
+│   └── blog/            # All blog posts as .md files (raw <video> + images from media bucket)
+├── layouts/             # Page layouts + global FX background (Layout.astro injects .fx-bg orbs/grid/grain)
 ├── pages/               # File-based routing
-│   ├── index.astro      # Home (hero + featured + recent)
-│   ├── posts/           # List + dynamic [slug] pages + OG image endpoint
-│   ├── tags/            # Tag index + [tag] filtered pages
-│   ├── about.md         # About page (uses AboutLayout)
-│   ├── search.astro     # Search UI
-│   ├── rss.xml.ts, robots.txt.ts, og.png.ts, etc.
-├── styles/base.css      # Design tokens + prose overrides
-├── utils/               # Helpers (getSortedPosts, getUniqueTags, slugify, pagination, OG generation)
-└── assets/
-    └── socialIcons.ts   # Inline SVG icons for social links
+│   ├── index.astro      # Home — "Personal mission log" hero with HUD stats (Pool/Strings/Lab), reveal animations, Featured + Latest
+│   ├── posts/           # List + dynamic [slug] + per-post OG
+│   ├── tags/            # Tag index + filtered pages
+│   ├── about.md         # About page
+│   ├── search.astro     # Client-side search
+│   └── ... (rss, robots, og.png.ts, etc.)
+├── styles/base.css      # Full mission-control theme: CSS vars, HUD styles, .grad-text, .kicker, .reveal, .hud-bracket, prose overrides, video glow frames, FX
+├── utils/
+│   └── getPostSlug.ts   # Canonical slug helper (content layer uses .id; used by Card + pages)
+└── ...
 ```
 
-`public/` contains static assets (favicon, logo, toggle-theme.js, images).
+`public/` contains static assets.
+
+The UI is intentionally playful and "cool kid": uppercase tracking, neon glows, console-like labels ("priority signal", "incoming transmissions", "Launch adventures").
 
 ## Content Model & Frontmatter
 
 Blog posts live in `src/content/blog/` as `.md` files.
 
-**Schema** (defined in `src/content/config.ts`):
+**Schema** (defined in `src/content.config.ts` using the glob loader):
 
 ```ts
 {
@@ -87,24 +93,32 @@ Post body (Markdown + raw HTML supported).
 
 ### Special Behaviors
 
-- `featured: true` → shown in the Featured section on the homepage
-- `draft: true` → hidden everywhere (including dev, via `postFilter`)
-- Future `pubDatetime` posts are hidden in production (15-minute margin via `SITE.scheduledPostMargin`)
-- Posts without a custom `ogImage` get auto-generated PNGs at build time via `/posts/[slug].png`
+- `featured: true` → shown in the Featured "priority signal" section
+- `draft: true` → hidden (postFilter)
+- Future posts hidden in prod (SITE.scheduledPostMargin)
+- Posts without ogImage get auto-generated PNGs
+- Slug resolution now uses `getPostSlug(post)` (src/utils/getPostSlug.ts) because the content glob loader exposes `.id` rather than legacy `.slug` in many cases.
 
 ## Key Pages & Features
 
 | Route                  | Description |
 |------------------------|-------------|
-| `/`                    | Home: Hero intro + Featured posts + Recent posts (max 4) |
-| `/posts/`              | Paginated archive (3 posts/page) |
-| `/posts/[slug]/`       | Full post view (PostDetails layout) |
-| `/tags/`               | All unique tags |
-| `/tags/[tag]/`         | Paginated posts filtered by tag |
-| `/search/`             | Client-side Fuse.js search (title + description), updates URL `?q=` |
-| `/about/`              | Simple about page |
-| `/rss.xml`             | Full post RSS feed |
-| `/sitemap-index.xml`   | Auto-generated |
+| `/`                    | Home: "Mission Log" hero with animated HUD stats (🏊 Pool / 🎻 Strings / 🧪 Lab), grad-text title, "Launch adventures" CTAs, Featured + Latest sections with "kicker" labels |
+| `/posts/`              | Paginated archive |
+| `/posts/[slug]/`       | Full post + glowing video frames |
+| `/tags/` + `/tags/[tag]/` | Tag navigation |
+| `/search/`             | Fuse.js search |
+| `/about/`              | About |
+| `/rss.xml` + sitemap   | Standard |
+
+**Theme / Visuals**:
+- Dark-only deep-space console
+- Glassy `.header-bar` (rounded-2xl, backdrop blur)
+- Pulsing `.logo-dot`, `.grad-text`, `.nav-link` + `.nav-active`
+- `.reveal` + staggered animation-delays
+- Custom background FX layer (grid + 3 drifting glow orbs + noise grain)
+- Special video styling in `.prose`
+- Lots of font-display + uppercase tracking-widest for "mission log" feel.
 
 **Post page extras**:
 - Datetime (pub/mod) with "Updated:" when `modDatetime` present
@@ -130,52 +144,64 @@ Videos are hosted on `https://isaacperera-media.s3.eu-west-2.amazonaws.com/` and
 
 ## Configuration Points
 
-- **Site metadata**: `src/config.ts` (`SITE`, `SOCIALS`, `LOCALE`)
-- **Content schema**: `src/content/config.ts`
-- **Posts per page**: `SITE.postPerPage` (currently 3)
-- **OG image dimensions**: Hardcoded 1200×630 in `generateOgImages.tsx`
-- **Social links**: Controlled per-item via `active` flag in `SOCIALS`
-- **Logo**: Controlled by `LOGO_IMAGE` (currently disabled, shows text title)
+- **Site metadata**: `src/config.ts` (`SITE`, `SOCIALS`, `LOCALE`, `lightAndDarkMode: false`)
+- **Content schema + loader**: `src/content.config.ts`
+- **Posts per page**: `SITE.postPerPage` (3)
+- **OG images**: 1200×630
+- **Logo / theme**: Logo is now a styled callsign in Header. Theme is dark-only with custom CSS vars in base.css.
+- **Amplify hosting**: See `amplify.yml` + Deployment section above.
 
 ## Build, Scripts & Deployment
 
 ```json
-// package.json (key scripts)
 "dev": "astro dev",
 "build": "astro build && jampack ./dist",
-"deploy": "aws s3 sync dist/ s3://isaacperera-client --delete",
-"postdeploy": "aws cloudfront create-invalidation --distribution-id E1T5SR7CSIVJHT --paths /*",
+"deploy": "echo 'Hosting on AWS Amplify — see GROK.md + amplify.yml'"
 ```
 
-- Production site deployed to AWS S3 + CloudFront.
-- Build output goes to `dist/`.
-- Docker compose available for dev (`docker-compose.yml`).
+**Hosting (as of latest update)**: AWS Amplify (static site hosting)
+
+- `amplify.yml` at repo root defines the build (npm ci → npm run build → serve `dist/`).
+- Recommended: Connect the Git repository directly in the AWS Amplify Console (Hosting → New app). Amplify auto-detects the config and deploys on push.
+- Manual deploys also supported (drag `dist/` folder or use Amplify CLI).
+- Build artifacts: `baseDirectory: dist`
+
+**Custom Domain + Certificates**
+- In Amplify Console: App settings → Domain management → Add domain.
+- You can bring your existing ACM certificate(s) (ensure the cert is in a supported region; Amplify often works best with certs it can manage or that match the domain validation).
+- Update DNS:
+  - Apex domain: Route 53 A/ALIAS record pointing to the Amplify domain (or use Amplify's nameservers).
+  - www / subdomains: CNAME to the Amplify-provided domain name.
+- Amplify will provision a managed certificate if you prefer not to use the existing one.
+
+**Old hosting** (S3 + CloudFront at s3://isaacperera-client + distro E1T5SR7CSIVJHT) has been retired in favor of Amplify.
+
+Docker compose is still available for local dev.
 
 ## Important Utilities
 
-- `postFilter.ts` — filters drafts + future posts
-- `getSortedPosts.ts` — applies filter + sorts by modDatetime (fallback pubDatetime)
-- `getUniqueTags.ts` / `getPostsByTag.ts` / `slugify.ts`
-- `getPagination.ts` + `getPageNumbers.ts`
-- `generateOgImages.tsx` + `og-templates/{post,site}.tsx`
+- `postFilter.ts`, `getSortedPosts.ts`, `getPagination.ts`, `getUniqueTags.ts`, `getPostsByTag.ts`
+- `getPostSlug.ts` — single source of truth for deriving the route slug from content layer entries (uses `post.id` primarily).
+- `generateOgImages.tsx` + og-templates
 
-## Notes & Customizations from AstroPaper
+## Notes & Customizations
 
-- Heavily tailored for a child's personal updates (swimming + music focus).
-- Heavy use of raw HTML video embeds inside MD content (not typical blog pattern).
-- Custom AWS S3 media hosting for videos/images.
-- No active social accounts linked in config (most `active: false`).
-- Uses `.md` files (not `.mdx`) but still leverages Astro content collections.
-- OG images are generated both at build (for pages that need them) and via endpoint.
+- The UI was completely refreshed into a **"Mission Log" / deep-space console** experience for a 10-year-old boy (neon HUD, glassy header, drifting glow orbs, grain, animated reveals, "kicker" labels, stat readouts).
+- Dark-only theme (`lightAndDarkMode: false` in `src/config.ts`).
+- Content uses the modern glob loader + `src/content.config.ts` (Astro 6/7 requirement).
+- Videos hosted externally (media S3) and embedded with special glowing frame styles.
+- No social accounts are active in the config.
+- Still uses plain `.md` files + raw HTML embeds.
 
 ## Quick Commands
 
 ```bash
-npm run dev          # Start dev server
-npm run build        # Production build + optimize
-npm run deploy       # Sync to S3 + invalidate CloudFront (requires AWS CLI auth)
-npm run format       # Prettier
+npm run dev
+npm run build
+npm run format
 ```
+
+**For deployment**: Push to the connected Git repo (Amplify auto-deploys) or use the Amplify Console manual deploy flow.
 
 ---
 

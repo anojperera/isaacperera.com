@@ -1,0 +1,29 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .npm/**/*
+
+# For AWS Amplify Hosting (static site)
+# 1. Connect your Git repo in the Amplify console (recommended)
+# 2. Amplify will auto-detect this file.
+# 3. Add your custom domain in App settings > Domain management.
+#    - Use existing ACM certificates where possible (must be in us-east-1 region for some flows).
+#    - Or let Amplify provision a managed certificate.
+# 4. Update DNS:
+#    - Apex: Use Route 53 A record alias to Amplify domain (or nameserver delegation)
+#    - www: CNAME to the Amplify provided domain
+#
+# The build outputs a static `dist/` folder which Amplify serves directly.

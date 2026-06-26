@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`isaacperera.com` — a personal static site for sharing a child's swimming, violin/strings, and science updates. Built on the [AstroPaper](https://github.com/satnaing/astro-paper) theme, heavily customized. Astro generates static HTML into `dist/`, which is synced to an S3 bucket served via CloudFront. **All media (videos/large images) is hosted in a separate S3 bucket** and embedded by URL — media is never committed to the repo.
+`isaacperera.com` — a personal static site for sharing a child's swimming, violin/strings, and science updates. Built on the [AstroPaper](https://github.com/satnaing/astro-paper) theme, heavily customized into a "Mission Log" / deep-space console UI.
+
+Astro generates static HTML into `dist/`. The site is now hosted on **AWS Amplify** (static hosting). **All media (videos/large images) is hosted in a separate S3 bucket** and embedded by URL — media is never committed to the repo.
 
 ## Commands
 
@@ -18,8 +20,10 @@ npm run lint         # ESLint
 npm run format       # Prettier (write) — uses prettier-plugin-astro
 npm run format:check # Prettier (check only)
 
-npm run deploy       # aws s3 sync dist/ s3://isaacperera-client --delete
-                     # postdeploy auto-runs: CloudFront invalidation (distribution E1T5SR7CSIVJHT)
+# Hosting is now on AWS Amplify.
+# - Connect the Git repo in the Amplify Console (uses amplify.yml)
+# - Or deploy the `dist/` folder manually in the console.
+# Old S3/CloudFront commands have been retired.
 ```
 
 - Use Node `21.1` (`.nvmrc`). `npm run deploy` requires authenticated AWS CLI.
